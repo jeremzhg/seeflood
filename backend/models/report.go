@@ -3,15 +3,18 @@ package models
 import "time"
 
 const (
-	DepthNone = "none"
-	DepthAnkle = "ankle_deep"
-	DepthKnee = "knee_deep"
-	DepthWaist = "waist_deep"
+	NoFlood = "none"
+	VeryLight = "very_light"
+	Light = "light"
+	Moderate = "moderate"
+	Severe = "severe"
 )
 
 const (
-	RiskSafe = "green"
-	RiskLow  = "yellow"
+	RiskSafe = "none"
+	RiskVeryLight  = "light_yellow"
+	RiskLight = "yellow"
+	RiskModerate = "light_red"
 	RiskHigh = "red"
 )
 

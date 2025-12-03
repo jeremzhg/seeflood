@@ -43,14 +43,18 @@ func (s *FloodService) ProcessReport(req models.ReportRequest, file *multipart.F
 		return nil, fmt.Errorf("failed to save file content: %w", err)
 	}
 
-	detectedDepth := models.DepthAnkle //TODO: post request to container when done
+	detectedDepth := models.RiskSafe //TODO: post request to container when done
 	
 	risk := models.RiskSafe // default: safe
 	switch detectedDepth {
-	case models.DepthKnee, models.DepthWaist:
+	case models.VeryLight:
+		risk = models.RiskVeryLight
+	case models.Light:
+		risk = models.RiskLight
+	case models.Moderate:
+		risk = models.RiskModerate
+	case models.Severe:
 		risk = models.RiskHigh
-	case models.DepthAnkle:
-		risk = models.RiskLow
 	}
 
 	report := &models.FloodReport{
