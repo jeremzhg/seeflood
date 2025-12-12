@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -36,6 +36,7 @@ function ChangeView({ center }) {
 }
 
 const MapComponent = ({ userLocation, reports }) => {
+    const [expandedImage, setExpandedImage] = useState(null);
     const defaultCenter = [51.505, -0.09]; // Default to London if no location
     const center = userLocation ? [userLocation.latitude, userLocation.longitude] : defaultCenter;
 
@@ -79,17 +80,69 @@ const MapComponent = ({ userLocation, reports }) => {
                                 <p>Risk: {report.risk_level}</p>
                                 <p>Depth: {report.flood_depth}</p>
                                 {report.image_url && (
-                                    <img 
-                                        src={`http://localhost:8080/${report.image_url}`} 
-                                        alt="Flood" 
-                                        style={{ width: '100px', height: 'auto' }} 
-                                    />
+                                    <div 
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => setExpandedImage(`http://localhost:8080${report.image_url}`)}
+                                    >
+                                        <img 
+                                            src={`http://localhost:8080${report.image_url}`} 
+                                            alt="Flood" 
+                                            style={{ 
+                                                width: '150px', 
+                                                height: '100px', 
+                                                objectFit: 'cover',
+                                                borderRadius: '4px',
+                                                border: '1px solid #ddd'
+                                            }} 
+                                        />
+                                        <div style={{ fontSize: '0.7rem', color: '#007bff', textAlign: 'center' }}>Click to expand</div>
+                                    </div>
                                 )}
+                                <p style={{ fontSize: '0.8rem', color: '#666' }}>
+                                    Last Updated: {new Date(report.created_at).toLocaleString()}
+                                </p>
                             </div>
                         </Popup>
                     </Marker>
                 ))}
             </MapContainer>
+
+            {expandedImage && (
+                <div 
+                    className="modal-overlay" 
+                    style={{ zIndex: 3000 }}
+                    onClick={() => setExpandedImage(null)}
+                >
+                    <div className="modal-content" style={{ width: 'auto', maxWidth: '90%', maxHeight: '90%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'transparent', boxShadow: 'none' }}>
+                        <img 
+                            src={expandedImage} 
+                            alt="Expanded Flood" 
+                            style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }} 
+                        />
+                        <button 
+                            onClick={() => setExpandedImage(null)}
+                            style={{
+                                position: 'absolute',
+                                top: '20px',
+                                right: '20px',
+                                background: 'white',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '40px',
+                                height: '40px',
+                                fontSize: '20px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                            }}
+                        >
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
