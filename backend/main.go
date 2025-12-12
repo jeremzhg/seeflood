@@ -42,6 +42,7 @@ func main() {
 	api := r.Group("/api")
 	{
 		api.POST("/report", reportHandler.CreateReport)
+		api.GET("/reports", reportHandler.GetReports)
 	}
 
 	// serve uploaded images statically ex: http://localhost:8080/uploads/what.jpg

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import MapComponent from './components/MapComponent';
 import UploadForm from './components/UploadForm';
 import './App.css';
@@ -8,6 +9,7 @@ function App() {
   const [reports, setReports] = useState([]);
 
   useEffect(() => {
+    // Get user location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -18,16 +20,29 @@ function App() {
         },
         (error) => {
           console.error("Error getting location:", error);
-          // Fallback or alert could go here
         }
       );
     } else {
       console.error("Geolocation is not supported by this browser.");
     }
+
+    // Fetch existing reports
+    const fetchReports = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/reports');
+        if (response.data.status === 'success') {
+          setReports(response.data.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch reports:", error);
+      }
+    };
+
+    fetchReports();
   }, []);
 
   const handleReportSubmitted = (newReport) => {
-    setReports((prevReports) => [...prevReports, newReport]);
+    setReports((prevReports) => [newReport, ...prevReports]);
   };
 
   return (

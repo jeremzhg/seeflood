@@ -73,3 +73,7 @@ func (s *FloodService) ProcessReport(req models.ReportRequest, file *multipart.F
 
 	return report, nil
 }
+
+func (s *FloodService) GetAllReports() ([]*models.FloodReport, error) {
+	return s.store.GetReports()
+}

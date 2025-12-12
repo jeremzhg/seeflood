@@ -47,3 +47,19 @@ func (h *ReportHandler) CreateReport(c *gin.Context) {
 		"data":   report,
 	})
 }
+
+// GET /api/reports endpoint
+func (h *ReportHandler) GetReports(c *gin.Context) {
+	reports, err := h.service.GetAllReports()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch reports: " + err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   reports,
+	})
+}

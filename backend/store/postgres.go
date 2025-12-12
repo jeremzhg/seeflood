@@ -73,3 +73,34 @@ func (s *Store) SaveReport(r *models.FloodReport) error {
 
 	return nil
 }
+
+func (s *Store) GetReports() ([]*models.FloodReport, error) {
+	query := `SELECT id, latitude, longitude, location_name, image_url, flood_depth, risk_level, created_at FROM flood_reports ORDER BY created_at DESC`
+	
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query reports: %w", err)
+	}
+	defer rows.Close()
+
+	var reports []*models.FloodReport
+	for rows.Next() {
+		r := &models.FloodReport{}
+		err := rows.Scan(
+			&r.ID,
+			&r.Latitude,
+			&r.Longitude,
+			&r.LocationName,
+			&r.ImageURL,
+			&r.FloodDepth,
+			&r.RiskLevel,
+			&r.CreatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan report: %w", err)
+		}
+		reports = append(reports, r)
+	}
+
+	return reports, nil
+}
