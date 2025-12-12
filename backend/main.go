@@ -31,7 +31,7 @@ func main() {
 	// setup webserver
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000", "http://127.0.0.1:3000"},
+		AllowOrigins: []string{"http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173"},
 		AllowMethods: []string{"GET", "POST", "PUT", "OPTIONS"},
 		AllowHeaders: []string{"Origin", "Content-Type"},
 		ExposeHeaders: []string{"Content-Length"},
