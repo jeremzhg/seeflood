@@ -7,6 +7,7 @@ import './App.css';
 function App() {
   const [userLocation, setUserLocation] = useState(null);
   const [reports, setReports] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     // Get user location
@@ -43,6 +44,7 @@ function App() {
 
   const handleReportSubmitted = (newReport) => {
     setReports((prevReports) => [newReport, ...prevReports]);
+    setShowModal(false);
   };
 
   return (
@@ -56,12 +58,25 @@ function App() {
           <MapComponent userLocation={userLocation} reports={reports} />
         </div>
         
-        <aside className="sidebar">
-          <UploadForm 
-            userLocation={userLocation} 
-            onReportSubmitted={handleReportSubmitted} 
-          />
-        </aside>
+        <button 
+          className="fab" 
+          onClick={() => setShowModal(true)}
+          aria-label="Report Flood"
+        >
+          +
+        </button>
+
+        {showModal && (
+          <div className="modal-overlay" onClick={() => setShowModal(false)}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <UploadForm 
+                userLocation={userLocation} 
+                onReportSubmitted={handleReportSubmitted}
+                onClose={() => setShowModal(false)}
+              />
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

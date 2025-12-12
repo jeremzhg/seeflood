@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const UploadForm = ({ userLocation, onReportSubmitted }) => {
+const UploadForm = ({ userLocation, onReportSubmitted, onClose }) => {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -40,6 +40,7 @@ const UploadForm = ({ userLocation, onReportSubmitted }) => {
                 setFile(null);
                 // Reset file input
                 e.target.reset();
+                if (onClose) onClose();
             }
         } catch (err) {
             console.error("Upload error:", err);
@@ -51,7 +52,15 @@ const UploadForm = ({ userLocation, onReportSubmitted }) => {
 
     return (
         <div className="upload-form-container">
-            <h2>Report Flood</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2>Report Flood</h2>
+                {onClose && (
+                    <button onClick={onClose} className="close-button" aria-label="Close">
+                        &times;
+                    </button>
+                )}
+            </div>
+            
             {userLocation ? (
                 <p className="location-info">
                     Location: {userLocation.latitude.toFixed(4)}, {userLocation.longitude.toFixed(4)}
@@ -76,6 +85,7 @@ const UploadForm = ({ userLocation, onReportSubmitted }) => {
                     type="submit" 
                     disabled={loading || !userLocation} 
                     className="submit-button"
+                    style={{ width: '100%', marginTop: '1rem' }}
                 >
                     {loading ? 'Submitting...' : 'Submit Report'}
                 </button>
