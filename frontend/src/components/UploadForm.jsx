@@ -1,14 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 
 const UploadForm = ({ userLocation, onReportSubmitted, onClose }) => {
     const [file, setFile] = useState(null);
+    const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const fileInputRef = useRef(null);
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-        setError(null);
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setPreview(URL.createObjectURL(selectedFile));
+            setError(null);
+        }
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile && droppedFile.type.startsWith('image/')) {
+            setFile(droppedFile);
+            setPreview(URL.createObjectURL(droppedFile));
+            setError(null);
+        }
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
     };
 
     const handleSubmit = async (e) => {
@@ -38,8 +60,7 @@ const UploadForm = ({ userLocation, onReportSubmitted, onClose }) => {
             if (response.data.status === 'success') {
                 onReportSubmitted(response.data.data);
                 setFile(null);
-                // Reset file input
-                e.target.reset();
+                setPreview(null);
                 if (onClose) onClose();
             }
         } catch (err) {
@@ -70,13 +91,30 @@ const UploadForm = ({ userLocation, onReportSubmitted, onClose }) => {
             )}
             
             <form onSubmit={handleSubmit}>
-                <div className="form-group">
+                <div 
+                    className="file-upload-area"
+                    onClick={() => fileInputRef.current.click()}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                >
                     <input 
                         type="file" 
                         accept="image/*" 
                         onChange={handleFileChange} 
-                        className="file-input"
+                        className="file-input-hidden"
+                        ref={fileInputRef}
                     />
+                    {preview ? (
+                        <div className="image-preview">
+                            <img src={preview} alt="Preview" />
+                            <p className="file-name">{file.name}</p>
+                        </div>
+                    ) : (
+                        <div className="upload-placeholder">
+                            <span className="upload-icon">📷</span>
+                            <p>Click or drag image here</p>
+                        </div>
+                    )}
                 </div>
                 
                 {error && <p className="error-message">{error}</p>}
