@@ -43,7 +43,11 @@ func (s *FloodService) ProcessReport(req models.ReportRequest, file *multipart.F
 		return nil, fmt.Errorf("failed to save file content: %w", err)
 	}
 
-	detectedDepth := models.RiskSafe //TODO: post request to container when done
+	detectedDepth, err := s.callPythonModel(savePath)
+	if err != nil {
+		fmt.Printf("prediction model error: %v\n", err)
+		detectedDepth = models.NoFlood // fallback
+	}
 	
 	risk := models.RiskSafe // default: safe
 	switch detectedDepth {
@@ -74,4 +78,28 @@ func (s *FloodService) ProcessReport(req models.ReportRequest, file *multipart.F
 
 func (s *FloodService) GetAllReports() ([]*models.FloodReport, error) {
 	return s.store.GetReports()
+}
+
+func (s *FloodService) callPythonModel(imagePath string) (string, error) {
+	var b bytes.Buffer
+	w := multipart.NewWriter(&b)
+	
+	f, err := os.Open(imagePath)
+	if err != nil { return "", err }
+	defer f.Close()
+
+	fw, _ := w.CreateFormFile("file", imagePath)
+	io.Copy(fw, f)
+	w.Close()
+
+	resp, err := http.Post("http://localhost:5000/predict", w.FormDataContentType(), &b)
+	if err != nil { return "", err }
+	defer resp.Body.Close()
+
+	var result struct {
+		Class string `json:"class"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	return result.Class, nil
 }
