@@ -1,6 +1,10 @@
 # SeeFlood
 
-A flood reporting application that allows users to upload images of floods with their location and visualize reports on a map.
+A flood reporting application that allows users to upload images of floods with their location and visualize reports on a map. Submission for Artificial Intelligence AOL
+Created by:
+-   Edward Wibowo
+-   Felicia Faustine Hidayat
+-   Jeremy Auriel Zhang
 
 ## Prerequisites
 
