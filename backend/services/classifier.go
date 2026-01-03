@@ -47,8 +47,6 @@ func (s *FloodService) ProcessReport(req models.ReportRequest, file *multipart.F
 	
 	risk := models.RiskSafe // default: safe
 	switch detectedDepth {
-	case models.VeryLight:
-		risk = models.RiskVeryLight
 	case models.Light:
 		risk = models.RiskLight
 	case models.Moderate:

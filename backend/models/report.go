@@ -4,7 +4,6 @@ import "time"
 
 const (
 	NoFlood = "none"
-	VeryLight = "very_light"
 	Light = "light"
 	Moderate = "moderate"
 	Severe = "severe"
@@ -12,7 +11,6 @@ const (
 
 const (
 	RiskSafe = "none"
-	RiskVeryLight  = "light_yellow"
 	RiskLight = "yellow"
 	RiskModerate = "light_red"
 	RiskHigh = "red"
