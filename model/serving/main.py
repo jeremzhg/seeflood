@@ -10,14 +10,14 @@ app = FastAPI()
 
 def get_model():
     model = models.mobilenet_v2(weights=None) 
-    model.classifier[1] = nn.Linear(model.last_channel, 4) 
+    model.classifier[1] = nn.Linear(model.last_channel, 3) 
     return model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = get_model()
 
 try:
-    state_dict = torch.load("seeflood_model.pth", map_location=device)
+    state_dict = torch.load("../training/seeflood_model.pth", map_location=device)
     model.load_state_dict(state_dict)
     model.to(device)
     model.eval() 
