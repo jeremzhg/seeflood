@@ -9,8 +9,8 @@ import uvicorn
 app = FastAPI()
 
 def get_model():
-    model = models.mobilenet_v2(weights=None) 
-    model.classifier[1] = nn.Linear(model.last_channel, 3) 
+    model = models.efficientnet_b0(weights=None)
+    model.classifier[1] = nn.Linear(model.classifier[1].in_features, 3)
     return model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -20,15 +20,18 @@ try:
     state_dict = torch.load("../training/seeflood_model.pth", map_location=device)
     model.load_state_dict(state_dict)
     model.to(device)
-    model.eval() 
-    print("✅ Seeflood PyTorch Model (MobileNetV2) loaded successfully")
+    model.eval()
+    print("model loaded successfully")
 except Exception as e:
-    print(f"Error loading model: {e}")
+    print(f"error: {e}")
 
 transform = transforms.Compose([
-    transforms.Resize((224, 224)),
+    transforms.Resize((320, 320)),
     transforms.ToTensor(),
-    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
 ])
 
 @app.post("/predict")
@@ -39,11 +42,13 @@ async def predict(file: UploadFile = File(...)):
     img_tensor = transform(image).unsqueeze(0).to(device)
     
     with torch.no_grad():
-        outputs = model(img_tensor)
-        _, predicted = torch.max(outputs, 1)
+        logits = model(img_tensor)
+        probs = torch.sigmoid(logits)
+        expected_val = probs.sum(dim=1)
+        predicted_idx = expected_val.round().long().clamp(0, 3)
         
-    classes = ["no flood", "light", "moderate", "severe"]
-    result = classes[predicted.item()]
+    classes = ["none", "light", "moderate", "severe"]
+    result = classes[predicted_idx.item()]
     
     return {"class": result}
 
