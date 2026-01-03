@@ -77,8 +77,13 @@ const MapComponent = ({ userLocation, reports }) => {
                         <Popup>
                             <div>
                                 <h3>Flood Report</h3>
-                                <p>Risk: {report.risk_level}</p>
-                                <p>Depth: {report.flood_depth}</p>
+                                <p>Risk: {
+                                    report.risk_level === 'yellow' ? 'Light Flooding' :
+                                    report.risk_level === 'light_red' ? 'Moderate Flooding' :
+                                    report.risk_level === 'red' ? 'Severe Flooding' :
+                                    report.risk_level === 'none' ? 'No Flooding' :
+                                    report.risk_level
+                                }</p>
                                 {report.image_url && (
                                     <div 
                                         style={{ cursor: 'pointer' }}
