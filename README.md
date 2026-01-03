@@ -9,6 +9,7 @@ Before you begin, ensure you have the following installed:
 -   [Go](https://go.dev/dl/) (version 1.24 or higher)
 -   [Node.js](https://nodejs.org/) (version 18 or higher)
 -   [PostgreSQL](https://www.postgresql.org/download/)
+-   [Python](https://www.python.org/downloads/) (version 3.8 or higher)
 
 ## Getting Started
 
@@ -47,7 +48,25 @@ Ensure you have a PostgreSQL database running. You will need to configure the co
     ```
     The server will start on `http://localhost:8080`.
 
-### 3. Frontend Setup
+### 3. Model Server Setup
+
+1.  Navigate to the `model/serving` directory:
+    ```bash
+    cd model/serving
+    ```
+
+2.  Install the required Python packages:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3.  Start the Python model server:
+    ```bash
+    python main.py
+    ```
+    The model server will start on `http://localhost:5000`.
+
+### 4. Frontend Setup
 
 1.  Navigate to the `frontend` directory:
     ```bash
