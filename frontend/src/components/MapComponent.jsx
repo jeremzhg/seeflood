@@ -56,6 +56,27 @@ function LocationButton({ userLocation }) {
     );
 }
 
+function Legend() {
+    const riskLevels = [
+        { level: 'Severe', color: RiskColors.red },
+        { level: 'Moderate', color: RiskColors.light_red },
+        { level: 'Light', color: RiskColors.yellow },
+        { level: 'None', color: RiskColors.none }
+    ];
+
+    return (
+        <div className="map-legend">
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}>Flood Risk</h4>
+            {riskLevels.map((risk) => (
+                <div key={risk.level} className="legend-item">
+                    <div className="legend-color" style={{ backgroundColor: risk.color }}></div>
+                    <span>{risk.level}</span>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 const MapComponent = ({ userLocation, reports }) => {
     const [expandedImage, setExpandedImage] = useState(null);
     const defaultCenter = [51.505, -0.09];
@@ -79,8 +100,10 @@ const MapComponent = ({ userLocation, reports }) => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <LocationButton userLocation={userLocation} />
                 
+                <LocationButton userLocation={userLocation} />
+                <Legend />
+
                 {userLocation && (
                     <Marker position={[userLocation.latitude, userLocation.longitude]}>
                         <Popup>
