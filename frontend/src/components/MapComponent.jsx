@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix for default marker icon
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -24,7 +23,6 @@ const RiskColors = {
     red: 'red'
 };
 
-// Component to update map center when location changes
 function ChangeView({ center }) {
     const map = useMap();
     useEffect(() => {
@@ -35,14 +33,36 @@ function ChangeView({ center }) {
     return null;
 }
 
+function LocationButton({ userLocation }) {
+    const map = useMap();
+
+    const handleClick = () => {
+        if (userLocation) {
+            map.flyTo([userLocation.latitude, userLocation.longitude], map.getZoom());
+        }
+    };
+
+    return (
+
+        <button
+            className="location-button"
+            onClick={handleClick}
+            title="Go to my location"
+        >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#666">
+                <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
+            </svg>
+        </button>
+    );
+}
+
 const MapComponent = ({ userLocation, reports }) => {
     const [expandedImage, setExpandedImage] = useState(null);
-    const defaultCenter = [51.505, -0.09]; // Default to London if no location
+    const defaultCenter = [51.505, -0.09];
     const center = userLocation ? [userLocation.latitude, userLocation.longitude] : defaultCenter;
 
     const getMarkerIcon = (riskLevel) => {
         const color = RiskColors[riskLevel] || 'blue';
-        // Create a custom div icon with the color
         return L.divIcon({
             className: 'custom-marker',
             html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>`,
@@ -59,6 +79,7 @@ const MapComponent = ({ userLocation, reports }) => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+                <LocationButton userLocation={userLocation} />
                 
                 {userLocation && (
                     <Marker position={[userLocation.latitude, userLocation.longitude]}>
