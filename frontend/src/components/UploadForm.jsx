@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
+import CameraCapture from './CameraCapture';
 
 const UploadForm = ({ userLocation, onReportSubmitted, onClose }) => {
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [showCamera, setShowCamera] = useState(false);
     const fileInputRef = useRef(null);
 
     const handleFileChange = (e) => {
@@ -71,8 +73,21 @@ const UploadForm = ({ userLocation, onReportSubmitted, onClose }) => {
         }
     };
 
+    const handleCameraCapture = (file) => {
+        setFile(file);
+        setPreview(URL.createObjectURL(file));
+        setError(null);
+        setShowCamera(false);
+    };
+
     return (
         <div className="upload-form-container">
+            {showCamera && (
+                <CameraCapture 
+                    onCapture={handleCameraCapture} 
+                    onCancel={() => setShowCamera(false)} 
+                />
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2>Report Flood</h2>
                 {onClose && (
@@ -104,6 +119,14 @@ const UploadForm = ({ userLocation, onReportSubmitted, onClose }) => {
                         className="file-input-hidden"
                         ref={fileInputRef}
                     />
+                    <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleFileChange} 
+                        className="file-input-hidden"
+                        ref={fileInputRef}
+                    />
+                    
                     {preview ? (
                         <div className="image-preview">
                             <img src={preview} alt="Preview" />
@@ -113,6 +136,16 @@ const UploadForm = ({ userLocation, onReportSubmitted, onClose }) => {
                         <div className="upload-placeholder">
                             <span className="upload-icon">📷</span>
                             <p>Click or drag image here</p>
+                            <div style={{ marginTop: '1rem', display: 'flex', gap: '10px' }}>
+                                <button 
+                                    type="button" 
+                                    onClick={(e) => { e.stopPropagation(); setShowCamera(true); }}
+                                    className="secondary-button"
+                                    style={{ padding: '0.5rem 1rem', borderRadius: '4px', border: '1px solid #ccc', background: 'white', cursor: 'pointer', position: 'relative', zIndex: 10 }}
+                                >
+                                    Take Photo
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
